@@ -1,0 +1,13 @@
+[
+  {
+    "network": "BITCOIN_TESTNET",
+    "chain_id": "18332",
+    "tokens": [
+      {
+        "symbol": "BTC",
+        "address": "NATIVE",
+        "decimals": 8
+      }
+    ]
+  }
+]
