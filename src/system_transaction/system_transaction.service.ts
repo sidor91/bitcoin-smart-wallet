@@ -1,37 +1,57 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { SystemTransaction } from 'src/db/system_transaction.entity';
-import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ESystemTransactionType, SystemTransaction } from './entity/system-transaction.entity';
+
 @Injectable()
 export class SystemTransactionService {
-  private logger = new Logger(SystemTransactionService.name);
   constructor(
     @InjectRepository(SystemTransaction)
-    private readonly systemTransactions: Repository<SystemTransaction>,
+    private readonly systemTransactionRepository: Repository<SystemTransaction>,
   ) {}
-  async create(data: any) {
-    return await this.systemTransactions.save(data);
+
+  async bulkInsert(transactions: SystemTransaction[]) {
+    return await this.systemTransactionRepository
+      .createQueryBuilder()
+      .insert()
+      .values(transactions)
+      .orIgnore()
+      .execute();
   }
 
-  async findAll() {
-    return await this.systemTransactions.find();
+  async insert(transaction: SystemTransaction) {
+    await this.systemTransactionRepository.insert(transaction);
   }
 
-  async findOne(req: { [key: string]: string | bigint | boolean | number }) {
-    return await this.systemTransactions.findOne({
-      where: req,
-    });
+  async update(key: string, data: Partial<SystemTransaction>) {
+    await this.systemTransactionRepository.update({ key }, data);
   }
 
-  async upsert(data: SystemTransaction) {
-    try {
-      const result = await this.systemTransactions.insert(data);
-      return result;
-    } catch (err) {
-      if (err.code !== '23505') {
-        throw new Error(err);
-      }
-      this.logger.error(`[SystemTransactionService]: Duplicate ${data.key}`);
-    }
+  async findUnspent(coldWalletAddress: string) {
+      const transactions = await this.systemTransactionRepository
+        .createQueryBuilder('tx')
+        .where('tx.spent = false')
+        .andWhere('tx.address != :address', { address: coldWalletAddress })
+        .andWhere('tx.type != :type', { type: ESystemTransactionType.TRANSFER })
+        .getMany();
+      return transactions.reduce(
+        (result: Record<string, SystemTransaction[]>, transaction) => {
+          const address = transaction.receiver;
+          if (!result[address]) {
+            result[address] = [];
+          }
+          result[address].push(transaction);
+          return result;
+        },
+        {},
+      );
+  }
+
+  public getSystemTransactionKey(transactionHash: string, tx_output_n: number) {
+    return transactionHash + '-' + tx_output_n;
+  }
+
+  async getOne(key: string) {
+    return await this.systemTransactionRepository.findOne({ where: { key } });
   }
 }

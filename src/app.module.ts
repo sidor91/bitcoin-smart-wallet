@@ -1,31 +1,33 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ListenerModule } from './listener/listener.module';
+import { BlockchainModule } from './blockchain/blockchain.module';
+import { TransactionModule } from './transaction/transaction.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import config from './config/config';
-import network from './config/network';
+import { WalletModule } from './wallet/wallet.module';
+import { BitcoinCoreModule } from './bitcoin-core/bitcoin-core.module';
+import { SystemTransactionModule } from './system_transaction/system_transaction.module';
+import btc_config from './config/btc-node.config'
+import databaseConfig from './config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config, network] }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => {
-        return {
-          type: 'postgres',
-          url: config.get('DB_URL'),
-          entities: [__dirname + '/db/*.entity{.ts,.js}'],
-          synchronize: true,
-          logging: ['error'],
-        };
-      },
-      inject: [ConfigService],
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [btc_config, databaseConfig],
     }),
-    ListenerModule,
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        const options = {
+          ...configService.get('databaseConfig'),
+        };
+        return options;
+      },
+    }),
+    BlockchainModule,
+    TransactionModule,
+    WalletModule,
+    BitcoinCoreModule,
+    SystemTransactionModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { SystemTransactionService } from './system_transaction.service';
+import { SystemTransactionController } from './system_transaction.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SystemTransaction } from 'src/db/system_transaction.entity';
+import { SystemTransaction } from './entity/system-transaction.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SystemTransaction])],
+  controllers: [SystemTransactionController],
   providers: [SystemTransactionService],
   exports: [SystemTransactionService],
 })
