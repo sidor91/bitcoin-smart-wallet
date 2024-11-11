@@ -4,7 +4,10 @@ import { ParsedTransaction } from 'src/bitcoin-core/interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Block } from 'src/db/block.entity';
 import { Repository } from 'typeorm';
-import { ESystemTransactionType, SystemTransaction } from 'src/system_transaction/entity/system-transaction.entity';
+import {
+  ESystemTransactionType,
+  SystemTransaction,
+} from 'src/system_transaction/entity/system-transaction.entity';
 import { WalletService } from 'src/wallet/wallet.service';
 import { SystemTransactionService } from 'src/system_transaction/system_transaction.service';
 import { MINUTE_IN_MS } from 'src/constants';

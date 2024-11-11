@@ -6,7 +6,10 @@ import { ConfigService } from '@nestjs/config';
 import { BitcoinCoreService } from 'src/bitcoin-core/bitcoin-core.service';
 import { SystemTransactionService } from 'src/system_transaction/system_transaction.service';
 import { FeeService } from 'src/fee/fee.service';
-import { ESystemTransactionType, SystemTransaction } from 'src/system_transaction/entity/system-transaction.entity';
+import {
+  ESystemTransactionType,
+  SystemTransaction,
+} from 'src/system_transaction/entity/system-transaction.entity';
 import { WalletService } from 'src/wallet/wallet.service';
 import { MINUTE_IN_MS } from 'src/constants';
 
@@ -33,7 +36,7 @@ export class TransactionService implements OnApplicationBootstrap {
   }
 
   private async sleep(ms: number) {
-    return await new Promise(resolve => setTimeout(resolve, ms))
+    return await new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   onApplicationBootstrap() {
@@ -52,7 +55,7 @@ export class TransactionService implements OnApplicationBootstrap {
       this.logger.error(err);
       throw err;
     } finally {
-      await this.sleep(MINUTE_IN_MS)
+      await this.sleep(MINUTE_IN_MS);
     }
   }
 
@@ -150,7 +153,7 @@ export class TransactionService implements OnApplicationBootstrap {
 
       const sentTransactionHash =
         await this.bitcoinCoreService.sendRawTransaction(signedTransaction);
-      
+
       await this.systemTransactionService.insert({
         key: this.systemTransactionService.getSystemTransactionKey(
           sentTransactionHash,
@@ -162,7 +165,7 @@ export class TransactionService implements OnApplicationBootstrap {
         tx_output_n: 0,
         sender: 'internal',
         receiver: this.cold_wallet,
-        spent: false
+        spent: false,
       });
 
       const singleTransactionFee = fee / psbt.inputCount;

@@ -11,10 +11,7 @@ export class FeeService {
   private defaultConfirmationNumber: number = 6;
   private readonly stuckWithFeeEstimationTimeout = MINUTE_IN_MS * 60;
 
-  constructor(
-    private readonly bitcoinCoreService: BitcoinCoreService,
-  ) {
-  }
+  constructor(private readonly bitcoinCoreService: BitcoinCoreService) {}
 
   public async estimate(dto: {
     numberOfInputs: number;

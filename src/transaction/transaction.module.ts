@@ -8,7 +8,13 @@ import { WalletModule } from 'src/wallet/wallet.module';
 import { SystemTransactionModule } from 'src/system_transaction/system_transaction.module';
 
 @Module({
-  imports: [ConfigModule, BitcoinCoreModule, FeeModule, WalletModule, SystemTransactionModule],
+  imports: [
+    ConfigModule,
+    BitcoinCoreModule,
+    FeeModule,
+    WalletModule,
+    SystemTransactionModule,
+  ],
   controllers: [TransactionController],
   providers: [TransactionService],
 })

@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ESystemTransactionType, SystemTransaction } from './entity/system-transaction.entity';
+import {
+  ESystemTransactionType,
+  SystemTransaction,
+} from './entity/system-transaction.entity';
 
 @Injectable()
 export class SystemTransactionService {
@@ -28,23 +31,23 @@ export class SystemTransactionService {
   }
 
   async findUnspent(coldWalletAddress: string) {
-      const transactions = await this.systemTransactionRepository
-        .createQueryBuilder('tx')
-        .where('tx.spent = false')
-        .andWhere('tx.address != :address', { address: coldWalletAddress })
-        .andWhere('tx.type != :type', { type: ESystemTransactionType.TRANSFER })
-        .getMany();
-      return transactions.reduce(
-        (result: Record<string, SystemTransaction[]>, transaction) => {
-          const address = transaction.receiver;
-          if (!result[address]) {
-            result[address] = [];
-          }
-          result[address].push(transaction);
-          return result;
-        },
-        {},
-      );
+    const transactions = await this.systemTransactionRepository
+      .createQueryBuilder('tx')
+      .where('tx.spent = false')
+      .andWhere('tx.address != :address', { address: coldWalletAddress })
+      .andWhere('tx.type != :type', { type: ESystemTransactionType.TRANSFER })
+      .getMany();
+    return transactions.reduce(
+      (result: Record<string, SystemTransaction[]>, transaction) => {
+        const address = transaction.receiver;
+        if (!result[address]) {
+          result[address] = [];
+        }
+        result[address].push(transaction);
+        return result;
+      },
+      {},
+    );
   }
 
   public getSystemTransactionKey(transactionHash: string, tx_output_n: number) {

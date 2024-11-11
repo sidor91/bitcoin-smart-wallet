@@ -15,6 +15,6 @@ export default () => {
   if (!port) {
     throw new Error(`BTC_NODE_PORT is missed!`);
   }
-    
-    return { btc_config: { username, password, host, port } };
-}
+
+  return { btc_config: { username, password, host, port } };
+};

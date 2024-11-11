@@ -11,7 +11,7 @@ import { SystemTransactionModule } from 'src/system_transaction/system_transacti
     TypeOrmModule.forFeature([Block]),
     BitcoinCoreModule,
     WalletModule,
-    SystemTransactionModule
+    SystemTransactionModule,
   ],
   providers: [BlockchainProcessor],
 })

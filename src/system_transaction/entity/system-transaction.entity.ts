@@ -1,9 +1,4 @@
-import {
-  Entity,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export declare enum ESystemTransactionType {
   PAYMENT = 'payment',

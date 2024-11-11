@@ -28,7 +28,10 @@ export class WalletService {
 
   public async findOne(address: string) {
     const wallet = await this.walletRepository.findOne({ where: { address } });
-    wallet['privateKey'] = this.walletEncryptionService.decrypt(wallet.privateKey, wallet.iv);
+    wallet['privateKey'] = this.walletEncryptionService.decrypt(
+      wallet.privateKey,
+      wallet.iv,
+    );
     return wallet;
   }
 
