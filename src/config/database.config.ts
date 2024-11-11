@@ -1,6 +1,9 @@
 import { DataSourceOptions } from 'typeorm';
 
 import { config as dotenvConfig } from 'dotenv';
+import { SystemTransaction } from 'src/system_transaction/entity/system-transaction.entity';
+import { Wallet } from 'src/wallet/entity/wallet.entity';
+import { Block } from 'src/db/block.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -22,10 +25,9 @@ export default () => {
   const databaseConfig: DataSourceOptions = {
     type: 'postgres',
     url: process.env.DB_URL,
-    entities: [`${__dirname}/../**/*.entity{.ts,.js}`],
+    entities: [SystemTransaction, Wallet, Block],
     logging: false,
-    migrations: [__dirname + '/../db/migrations/*.ts'],
-    synchronize: false,
+    synchronize: true,
     migrationsRun: false,
     ...ssl,
   };

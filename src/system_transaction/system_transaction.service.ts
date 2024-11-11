@@ -34,8 +34,8 @@ export class SystemTransactionService {
     const transactions = await this.systemTransactionRepository
       .createQueryBuilder('tx')
       .where('tx.spent = false')
-      .andWhere('tx.address != :address', { address: coldWalletAddress })
-      .andWhere('tx.type != :type', { type: ESystemTransactionType.TRANSFER })
+      .andWhere('tx.receiver != :receiver', { receiver: coldWalletAddress })
+      // .andWhere('tx.type != :type', { type: ESystemTransactionType.TRANSFER })
       .getMany();
     return transactions.reduce(
       (result: Record<string, SystemTransaction[]>, transaction) => {

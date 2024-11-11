@@ -1,4 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable, Logger,
+  // OnModuleInit
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 // @ts-ignore
 import bitcoinCore from 'bitcoin-core';
@@ -13,11 +16,13 @@ export class GetRawTransactionException extends Error {}
 export class EstimateFeeException extends Error {}
 
 @Injectable()
-export class BitcoinCoreService implements OnModuleInit {
+export class BitcoinCoreService
+  // implements OnModuleInit
+{
   private logger: Logger;
   private client: bitcoinCore;
   private batchSize: number = 100; // Max number of simultaneous requests to rpc
-  private isPrunedNode: boolean;
+  private isPrunedNode: boolean = true;
   private defaultSender: string = 'bitcoin_unknown_sender';
   private decimals: number = 8;
   private defaultConfirmationNumber: number = 6;
@@ -33,9 +38,9 @@ export class BitcoinCoreService implements OnModuleInit {
    * @description Checks if the module is initialized and sets the pruned node flag.
    * @returns {Promise<void>}
    */
-  async onModuleInit(): Promise<void> {
-    this.isPrunedNode = await this.checkIsPruned();
-  }
+  // async onModuleInit(): Promise<void> {
+  //   this.isPrunedNode = await this.checkIsPruned();
+  // }
 
   public async getBalance(): Promise<number> {
     return await this.client.command('getbalance');
