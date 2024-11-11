@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   BitcoinCoreService,
   EstimateFeeException,
@@ -8,18 +7,13 @@ import { MINUTE_IN_MS } from 'src/constants';
 
 @Injectable()
 export class FeeService {
-  private readonly logger: Logger;
-  private defaultConfirmationNumber: number;
+  private readonly logger: Logger = new Logger(FeeService.name);
+  private defaultConfirmationNumber: number = 6;
   private readonly stuckWithFeeEstimationTimeout = MINUTE_IN_MS * 60;
 
   constructor(
     private readonly bitcoinCoreService: BitcoinCoreService,
-    private readonly configService: ConfigService,
   ) {
-    this.logger = new Logger(FeeService.name);
-    this.defaultConfirmationNumber = Number(
-      this.configService.getOrThrow('defaultConfirmationNumber'),
-    );
   }
 
   public async estimate(dto: {

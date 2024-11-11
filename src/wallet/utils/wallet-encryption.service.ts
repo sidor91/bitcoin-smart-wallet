@@ -9,7 +9,7 @@ export class WalletEncryptionService {
   constructor(private readonly configService: ConfigService) {
     const encryptionKey = this.configService.getOrThrow('ENCRYPTION_KEY');
 
-    if (!encryptionKey || encryptionKey.length !== 32) {
+    if (!encryptionKey || encryptionKey.length !== 64) {
       throw new Error('ENCRYPTION_KEY is missing or has invalid length');
     }
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 // @ts-ignore
-import * as bitcoinCore from 'bitcoin-core';
+import bitcoinCore from 'bitcoin-core';
 import {
   GetBlockResponse,
   GetBlockResponseTransaction,
@@ -19,19 +19,14 @@ export class BitcoinCoreService implements OnModuleInit {
   private batchSize: number = 100; // Max number of simultaneous requests to rpc
   private isPrunedNode: boolean;
   private defaultSender: string = 'bitcoin_unknown_sender';
-  private decimals: number;
-  private defaultConfirmationNumber: number;
+  private decimals: number = 8;
+  private defaultConfirmationNumber: number = 6;
   private maxBlocks: number = 1008;
-  private maxFeeRate: number;
+  private maxFeeRate: number = 0.00001;
 
   constructor(private configService: ConfigService) {
     this.client = new bitcoinCore(this.configService.get('btc_config'));
-    this.decimals = Number(this.configService.getOrThrow('token')?.decimals);
-    this.defaultConfirmationNumber = Number(
-      this.configService.getOrThrow('defaultConfirmationNumber'),
-    );
     this.logger = new Logger(BitcoinCoreService.name);
-    this.maxFeeRate = Number(this.configService.getOrThrow('maxFeeRate'));
   }
 
   /**
@@ -338,40 +333,40 @@ export class BitcoinCoreService implements OnModuleInit {
   private async getRawTransactionSender(
     transaction: RawTransaction,
   ): Promise<string> {
-   if (this.isPrunedNode) return this.defaultSender;
+    if (this.isPrunedNode) return this.defaultSender;
 
-   const sender: string[] = [];
-   const { vin: vinArray } = transaction;
+    const sender: string[] = [];
+    const { vin: vinArray } = transaction;
 
-   if (!vinArray || vinArray.length === 0) return this.defaultSender;
-   for (const vinItem of vinArray) {
-     if (!vinItem.txid) {
-       continue;
-     }
-     try {
-       const rawTransaction = await this.getRawTransactionWithoutBlockhash(
-         vinItem.txid,
-       );
-       const parsedTransactions =
-         await this.parseRawTransaction(rawTransaction);
-       if (
-         parsedTransactions.length > 0 &&
-         vinItem.vout < parsedTransactions.length
-       ) {
-         sender.push(parsedTransactions[vinItem.vout].receiver);
-       } else {
-         sender.push(this.defaultSender);
-       }
-     } catch (error: unknown) {
-       if (error instanceof Error) {
-         this.logger.error(`getSender error: ${error.message}`, error.stack);
-       } else {
-         this.logger.error(`getSender error: ${error}`);
-       }
-       sender.push(this.defaultSender);
-     }
-   }
-   return sender.join('-');
+    if (!vinArray || vinArray.length === 0) return this.defaultSender;
+    for (const vinItem of vinArray) {
+      if (!vinItem.txid) {
+        continue;
+      }
+      try {
+        const rawTransaction = await this.getRawTransactionWithoutBlockhash(
+          vinItem.txid,
+        );
+        const parsedTransactions =
+          await this.parseRawTransaction(rawTransaction);
+        if (
+          parsedTransactions.length > 0 &&
+          vinItem.vout < parsedTransactions.length
+        ) {
+          sender.push(parsedTransactions[vinItem.vout].receiver);
+        } else {
+          sender.push(this.defaultSender);
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          this.logger.error(`getSender error: ${error.message}`, error.stack);
+        } else {
+          this.logger.error(`getSender error: ${error}`);
+        }
+        sender.push(this.defaultSender);
+      }
+    }
+    return sender.join('-');
   }
 
   /**
